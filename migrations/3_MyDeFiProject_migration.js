@@ -23,7 +23,7 @@ module.exports = async function (deployer) {
   const DaiAddress = await DaiContract.options.address;
   //console.log(DaiAddress);
 
-  // Deploy de MyDeFiProject avec l'arguemnt du constructor
+  // Deploy de MyDeFiProject avec l'argument du constructor
   await deployer.deploy(MyDeFiProject, DaiAddress);
 };
 
