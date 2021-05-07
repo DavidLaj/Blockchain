@@ -9,7 +9,7 @@ contract MyDeFiProject {
         dai = IERC20(daiAddress);
     }
 
-    function foo() external {
-        dai.transfer(msg.sender, 100);
+    function foo(address recipient, uint amount) external {
+        dai.transfer(recipient, amount);
     }
 }
