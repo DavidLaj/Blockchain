@@ -18,6 +18,7 @@
  *
  */
 
+// npm install @truffle/hdwallet-provider
 const HDWalletProvider = require("@truffle/hdwallet-provider");
 // const infuraKey = "fj4jll3k.....";
 //
@@ -78,16 +79,17 @@ module.exports = {
     // },
     // Useful for deploying to a public network.
     // NB: It's important to wrap the provider as a function.
-    ropsten: {
+    kovan: {
       provider: () =>
         new HDWalletProvider({
           mnemonic: mnemonic,
           providerOrUrl:
-            "https://ropsten.infura.io/v3/4635fab1f2a448dda1f8e6098e3ee139",
+            "https://kovan.infura.io/v3/c7954c840d87401cb7181c9f5aa179dc",
+          chainId: 42,
           //addressIndex: 0,
           //numberOfAddresses: 1,
         }),
-      network_id: 3, // Ropsten's id
+      network_id: 42, // Kovan's id
       gas: 5500000, // Ropsten has a lower block limit than mainnet
       // confirmations: 2,    // # of confs to wait between deployments. (default: 0)
       // timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
