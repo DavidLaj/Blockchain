@@ -10,6 +10,7 @@ contract MyDeFiProject {
     }
 
     function foo(address recipient, uint amount) external {
+        //transferFrom...
         dai.transfer(recipient, amount);
     }
 }
