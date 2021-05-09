@@ -1,6 +1,7 @@
 const Web3 = require("web3");
 const MyContract = require("./build/contracts/MyDeFiProject.json");
-const DAIcontract = require("./build/contracts/DAI.json");
+// Pour avoir la ABI, on peut copy-paste le source code du contract de etherscan dans remix, compiler et copy-paste ABI dans un fichier
+const DAIcontract = require("./build/contracts/Dai.json");
 
 const HDWalletProvider = require("@truffle/hdwallet-provider");
 
@@ -14,52 +15,76 @@ const init = async () => {
     mnemonic: mnemonic,
     providerOrUrl:
       "https://kovan.infura.io/v3/c7954c840d87401cb7181c9f5aa179dc",
+    chainId: 42,
     // index where to start
     addressIndex: 0,
     numberOfAddresses: 5,
   });
+
   // web3 instance
   const web3 = new Web3(customProvider);
-  //or
-  // const web3 = new Web3("http://localhost:8545");
-  //or
-  // const provider = new Web3.providers.HttpProvider('http://localhost:8545')
-  // const new Web3(provider);
 
   const addresses = await web3.eth.getAccounts();
-  console.log(addresses);
-  await web3.eth.getBalance(addresses[0]).then(console.log);
+  //console.log(addresses);
+  //await web3.eth.getBalance(addresses[0]).then(console.log);
 
   // MyDeFiProject contract instance
   const id = await web3.eth.net.getId();
-  console.log(id);
+  //console.log(id);
   const deployedNetwork = MyContract.networks[id];
-  console.log(deployedNetwork);
-  console.log(deployedNetwork.address);
+  //console.log(deployedNetwork);
+  //console.log(deployedNetwork.address);
   const myDeFiProject = new web3.eth.Contract(
     MyContract.abi,
     deployedNetwork.address
   );
+  //console.log(await myDeFiProject.options.address);
 
   // DAI contract instance
   const daiContract = new web3.eth.Contract(
-    DAIcontract.abi,
+    DAIcontract,
     "0x4f96fe3b7a6cf9725f59d353f723c1bdb64ca6aa"
   );
 
-  console.log(await myDeFiProject.options.address);
+  // Execute foo function from MyDeFiProject contract
+  await myDeFiProject.methods.foo(addresses[0], 10).send(
+    {
+      from: addresses[0],
+      gas: "2000000",
+    },
+    function (err, res) {
+      if (err) {
+        console.log("An error occured", err);
+        return;
+      }
+      console.log("Hash of the transaction: " + res);
+    }
+  );
 
-  // WORK send a transaction to a function of the smart contract
-  await myDeFiProject.methods.foo(addresses[0], 10).send({
-    from: addresses[0],
-    gas: "2000000",
-  });
+  // En utilisiant directement la fonction transfer du DaiToken contract pour le transfer inverse des fonds:
 
-  //   const balance0 = await DAIcontract.balanceOf(myDeFiProject.address);
-  //   const balance1 = await DAIcontract.balanceOf(addresses[0]);
+  //   await daiContract.methods.transfer(myDeFiProject.options.address, "10").send(
+  //     {
+  //       from: addresses[0],
+  //       gas: "2000000",
+  //     },
+  //     function (err, res) {
+  //       if (err) {
+  //         console.log("An error occured", err);
+  //         return;
+  //       }
+  //       console.log("Hash of the transaction: " + res);
+  //     }
+  //   );
 
-  //   console.log(balance0.toString());
-  //   console.log(balance1.toString());
+  // On verifie la balance des deux addresses avec la fonction balanceOf du DaiToken contract
+  const balance0 = await daiContract.methods
+    .balanceOf(myDeFiProject.options.address)
+    .call();
+  const balance1 = await daiContract.methods.balanceOf(addresses[0]).call();
+
+  console.log(balance0.toString());
+  console.log(balance1.toString());
 };
 
 init();
